@@ -48,6 +48,8 @@ class CoordinateSystem:
         if transform.shape != (3, 3):
             raise ValueError('')
 
+        self._coordinate_transform = transform
+
     def set_global_transform(self, translation: np.ndarray,
                              rotation: np.ndarray):
         """Sets the global transform."""
@@ -95,12 +97,11 @@ class CoordinateSystem:
         rot = state.rot
         vel = state.vel
         angular_vel = state.angular_vel
-        if self._coordinate_transform:
+        if self._coordinate_transform is not None:
             if pos is not None:
                 pos = np.matmul(self._coordinate_transform, pos)
             if rot is not None:
-                rot = np.matmul(self._coordinate_transform, rot)
-                rot = np.matmul(rot, np.transpose(self._coordinate_transform))
+                rot = np.matmul(np.transpose(self._coordinate_transform), rot)
             if vel is not None:
                 vel = np.matmul(self._coordinate_transform, vel)
             if angular_vel is not None:

@@ -32,6 +32,7 @@ class VrTrackerComponent(HardwareTrackerComponent):
     _VR_CLIENT = None
 
     # Transform from OpenVR space (y upwards) to simulation space (z upwards).
+    # Rotate coordinate system along x axis on pi/2 clockwise
     GLOBAL_TRANSFORM = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]],
                                 dtype=np.float32)
 
