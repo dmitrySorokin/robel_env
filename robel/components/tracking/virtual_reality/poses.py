@@ -43,5 +43,10 @@ class VrPoseBatch:
             # Check that the pose is valid.
             # If all of the translations are 0, get from the cache.
             assert vr_pose.shape == (3, 4)
-            state = TrackerState(pos=vr_pose[:, 3], rot=vr_pose[:, :3])
+            state = TrackerState(
+                pos=vr_pose[:, 3],
+                rot=vr_pose[:, :3],
+                vel=self.poses[device.index].vVelocity[:],
+                angular_vel=self.poses[device.index].vAngularVelocity[:]
+            )
         return state

@@ -331,6 +331,8 @@ class RobotEnv(gym.Env, metaclass=abc.ABCMeta):
 
     def close(self):
         """Cleans up any resources used by the environment."""
+        self._close()
+
         for component in self._components:
             component.close()
         self._components.clear()
@@ -339,6 +341,10 @@ class RobotEnv(gym.Env, metaclass=abc.ABCMeta):
     #===========================================================================
     # Overridable Methods
     #===========================================================================
+
+    @abc.abstractmethod
+    def _close(self):
+        """Perform actions when environment is closed"""
 
     @abc.abstractmethod
     def _reset(self):

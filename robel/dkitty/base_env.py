@@ -186,6 +186,10 @@ class BaseDKittyEnv(RobotEnv, metaclass=abc.ABCMeta):
     def _configure_tracker(self, builder: TrackerComponentBuilder):
         """Configures the tracker component."""
 
+    def _close(self):
+        """Put Dkitty on the flor after closing environment"""
+        self._hardware_reset.finish_action()
+
     def _initialize_action_space(self) -> gym.Space:
         """Returns the observation space to use for this environment."""
         qpos_indices = self.robot.get_config('dkitty').qpos_indices

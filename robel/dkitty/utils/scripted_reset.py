@@ -89,6 +89,10 @@ class ScriptedDKittyResetProcedure(ResetProcedure):
             self._perform_tuck_under()
             self._perform_stand_up()
 
+    def finish_action(self):
+        """Perform action when environment is closed to avoid random falling"""
+        self._perform_tuck_under()
+
     def _is_standing(self) -> bool:
         """Returns True if the D'Kitty is fully standing."""
         state = self._tracker.get_state('torso', raw_states=True)
