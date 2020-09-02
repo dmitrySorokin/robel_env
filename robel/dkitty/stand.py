@@ -23,6 +23,7 @@ from typing import Dict, Optional, Sequence
 
 import numpy as np
 
+from robel.components.robot import RobotState
 from robel.components.tracking import TrackerState
 from robel.dkitty.base_env import BaseDKittyUprightEnv
 from robel.simulation.randomize import SimRandomizer
@@ -87,7 +88,7 @@ class BaseDKittyStand(BaseDKittyUprightEnv, metaclass=abc.ABCMeta):
 
     def _reset(self):
         """Resets the environment."""
-        self._reset_dkitty_standing(kitty_pos=self._initial_pose,)
+        self._reset_dkitty_standing()
         self.tracker.set_state({
             'torso': TrackerState(pos=np.zeros(3), rot=np.identity(3)),
         })
@@ -185,10 +186,13 @@ class DKittyStandRandom(BaseDKittyStand):
 
     def _reset(self):
         """Resets the environment."""
+        super()._reset()
         limits = self.robot.get_config('dkitty').qpos_range
         self._initial_pose = self.np_random.uniform(
             low=limits[:, 0], high=limits[:, 1])
-        super()._reset()
+        self.robot.set_state({
+            'dkitty': RobotState(qpos=self._initial_pose),  # Set the random position
+        })
 
 
 @configurable(pickleable=True)
