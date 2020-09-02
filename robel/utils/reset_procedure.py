@@ -36,6 +36,9 @@ class ResetProcedure(metaclass=abc.ABCMeta):
     def finish(self):
         """Called when the reset is complete."""
 
+    def finish_action(self):
+        """Perform action when environment is closed to avoid random falling"""
+
 
 class ManualResetProcedure(ResetProcedure):
     """Reset procedure that waits for the user to press enter."""
@@ -49,3 +52,7 @@ class ManualResetProcedure(ResetProcedure):
     def finish(self):
         """Called when the reset is complete."""
         input('Press Enter to start the episode...')
+
+    def finish_action(self):
+        """Perform action when environment is closed to avoid random falling"""
+

@@ -188,7 +188,8 @@ class BaseDKittyEnv(RobotEnv, metaclass=abc.ABCMeta):
 
     def _close(self):
         """Put Dkitty on the flor after closing environment"""
-        self._hardware_reset.finish_action()
+        if self._hardware_reset:
+            self._hardware_reset.finish_action()
 
     def _initialize_action_space(self) -> gym.Space:
         """Returns the observation space to use for this environment."""

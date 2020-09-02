@@ -66,10 +66,6 @@ class ManualAutoDKittyResetProcedure(ResetProcedure):
         # Wait until the robot is sufficiently upright.
         self._wait_until_upright()
 
-    def finish_action(self):
-        """Perform action when environment is closed to avoid random falling"""
-        pass
-
     def _wait_until_upright(self):
         """Waits until the D'Kitty is upright."""
         upright_checks = 0
