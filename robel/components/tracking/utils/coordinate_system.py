@@ -101,7 +101,11 @@ class CoordinateSystem:
             if pos is not None:
                 pos = np.matmul(self._coordinate_transform, pos)
             if rot is not None:
-                rot = np.matmul(np.transpose(self._coordinate_transform), rot)
+                # tracker to base station coord system
+                rot_mat = np.array([[0, 0, 1.], [-1., 0, 0], [0, -1., 0]])
+                rot = np.matmul(rot, rot_mat)
+                # tracker to robel coord system
+                rot = np.matmul(np.matmul(self._coordinate_transform, rot), self._coordinate_transform.T)
             if vel is not None:
                 vel = np.matmul(self._coordinate_transform, vel)
             if angular_vel is not None:
