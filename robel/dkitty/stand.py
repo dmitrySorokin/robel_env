@@ -220,7 +220,7 @@ class DKittyStandRandomDynamics(DKittyStandRandom):
         )
         self._randomizer.randomize_actuators(
             all_same=True,
-            kp_range=(2, 4),
+            kp_range=(2.5, 3.0),
         )
         # Randomize friction on all geoms in the scene.
         self._randomizer.randomize_geoms(
@@ -234,5 +234,6 @@ class DKittyStandRandomDynamics(DKittyStandRandom):
             total_mass_range=(1.6, 2.0),
             height_field_range=(0, 0.05),
         )
-        self.sim_scene.upload_height_field(0)
+        if len(self.sim.render_contexts) > 0:
+            self.sim_scene.upload_height_field(0)
         super()._reset()

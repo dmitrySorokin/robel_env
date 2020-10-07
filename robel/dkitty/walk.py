@@ -264,7 +264,7 @@ class DKittyWalkRandom(BaseDKittyWalk):
 
 
 @configurable(pickleable=True)
-class DKittyWalkRandomDynamics(DKittyWalkRandom):
+class DKittyWalkRandomDynamics(DKittyWalkFixed):
     """Walk straight towards a random location."""
 
     def __init__(self,
@@ -288,7 +288,7 @@ class DKittyWalkRandomDynamics(DKittyWalkRandom):
         )
         self._randomizer.randomize_actuators(
             all_same=True,
-            kp_range=(2.8, 3.2),
+            kp_range=(2.5, 3.0),
         )
         # Randomize friction on all geoms in the scene.
         self._randomizer.randomize_geoms(
@@ -302,5 +302,6 @@ class DKittyWalkRandomDynamics(DKittyWalkRandom):
             total_mass_range=(1.6, 2.0),
             height_field_range=(0, 0.05),
         )
-        self.sim_scene.upload_height_field(0)
+        if len(self.sim.render_contexts) > 0:
+            self.sim_scene.upload_height_field(0)
         super()._reset()
