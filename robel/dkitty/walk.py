@@ -150,14 +150,17 @@ class BaseDKittyWalk(BaseDKittyUprightEnv, metaclass=abc.ABCMeta):
         target_state, heading_state, torso_track_state = self.tracker.get_state(
             ['target', 'heading', 'torso'])
 
-        target_xy = target_state.pos[:2]
+        #target_xy = target_state.pos[:2]
+        target_xy = np.array([0, 2])
         kitty_xy = torso_track_state.pos[:2]
 
         # Get the heading of the torso (the y-axis).
         current_heading = torso_track_state.rot[:2, 1]
 
         # Get the direction towards the heading location.
-        desired_heading = heading_state.pos[:2] - kitty_xy
+        #heading_xy = heading_state.pos[:2]
+        heading_xy = np.array([0, 2])
+        desired_heading = heading_xy - kitty_xy
 
         # Calculate the alignment of the heading with the desired direction.
         heading = calculate_cosine(current_heading, desired_heading)
