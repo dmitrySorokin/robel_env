@@ -119,6 +119,46 @@ class BaseDKittyEnv(RobotEnv, metaclass=abc.ABCMeta):
         if plot_tracking and self.tracker.is_hardware:
             self.tracker.show_plot()
 
+    def env_params(self):
+        mass = self.sim_scene.get_mjlib().mj_getTotalmass(self.sim_scene.get_handle(self.model))
+
+        kp_up = np.mean(self.model.actuator_gainprm[:, 0])
+        kp_down = np.mean(self.model.actuator_biasprm[:, 1])
+        assert (np.allclose(self.model.actuator_gainprm[:, 0], kp_up))
+        assert (np.allclose(self.model.actuator_biasprm[:, 1], kp_down))
+        assert kp_up == -kp_down
+
+        geom_ids = list(range(self.model.ngeom))
+        friction_slide = np.mean(self.model.geom_friction[geom_ids, 0])
+        assert (np.allclose(self.model.geom_friction[geom_ids, 0], friction_slide))
+        friction_spin = np.mean(self.model.geom_friction[geom_ids, 1])
+        assert (np.allclose(self.model.geom_friction[geom_ids, 1], friction_spin))
+        friction_roll = np.mean(self.model.geom_friction[geom_ids, 2])
+        assert (np.allclose(self.model.geom_friction[geom_ids, 2], friction_roll))
+
+        dof_ids = (self.robot.get_config('dkitty').qvel_indices.tolist())
+        damping = np.mean(self.model.dof_damping[dof_ids])
+        assert (np.allclose(self.model.dof_damping[dof_ids], damping))
+        friction_loss = np.mean(self.model.dof_frictionloss[dof_ids])
+        assert (np.allclose(self.model.dof_frictionloss[dof_ids], friction_loss))
+
+        forcerange_down = np.mean(self.model.actuator_forcerange[:, 0])
+        forcerange_up = np.mean(self.model.actuator_forcerange[:, 1])
+        assert (np.allclose(self.model.actuator_forcerange[:, 0], forcerange_down))
+        assert (np.allclose(self.model.actuator_forcerange[:, 1], forcerange_up))
+        assert forcerange_up == -forcerange_down
+
+        return {
+            'mass': mass,
+            'kp': kp_up,
+            'friction_slide': friction_slide,
+            'friction_spin': friction_spin,
+            'friction_roll': friction_roll,
+            'damping': damping,
+            'friction_loss': friction_loss,
+            'force_limit': forcerange_up
+        }
+
     def get_state(self) -> Dict[str, np.ndarray]:
         """Returns the current state of the environment."""
         kitty_state = self.robot.get_state('dkitty')
