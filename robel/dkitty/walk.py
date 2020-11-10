@@ -29,6 +29,8 @@ from robel.simulation.randomize import SimRandomizer
 from robel.utils.configurable import configurable
 from robel.utils.math_utils import calculate_cosine
 from robel.utils.resources import get_asset_path
+from transforms3d.euler import euler2quat
+
 
 DKITTY_ASSET_PATH = 'robel/dkitty/assets/dkitty_walk-v0.xml'
 
@@ -218,12 +220,29 @@ class BaseDKittyWalk(BaseDKittyUprightEnv, metaclass=abc.ABCMeta):
 class DKittyWalkFixed(BaseDKittyWalk):
     """Walk straight towards a fixed location."""
 
+    def __init__(self, angle=0, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.angle = angle
+
+        floor_id = self.model.geom_name2id('floor')
+        target_id = self.model.site_name2id('target')
+        heading_id = self.model.site_name2id('heading')
+        hfield_id = self.model.geom_name2id('hfield1')
+        body_id = self.model.body_name2id('kitty_frame')
+
+        quat = euler2quat(np.sin(angle), 0, 0)
+        self.model.geom_quat[floor_id] = quat
+        self.model.geom_quat[hfield_id] = quat
+        self.model.site_quat[target_id] = quat
+        self.model.site_quat[heading_id] = quat
+        self.model.body_quat[body_id] = quat
+
     def _reset(self):
         """Resets the environment."""
         target_dist = 2.0
         target_theta = np.pi / 2  # Point towards y-axis
         self._initial_target_pos = target_dist * np.array([
-            np.cos(target_theta), np.sin(target_theta), 0
+            np.cos(target_theta), np.sin(target_theta) * np.cos(self.angle), np.sin(self.angle)
         ])
         super()._reset()
 
@@ -258,7 +277,7 @@ class DKittyWalkRandom(BaseDKittyWalk):
         target_theta = np.pi / 2 + self.np_random.uniform(
             *self._target_angle_range)
         self._initial_target_pos = target_dist * np.array([
-            np.cos(target_theta), np.sin(target_theta), 0
+            np.cos(target_theta), np.sin(target_theta) * np.cos(self.angle), np.sin(self.angle)
         ])
         super()._reset()
 
