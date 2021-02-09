@@ -319,7 +319,7 @@ class DKittyWalkRandomDynamics(DKittyWalkFixed):
         # Generate a random height field.
         self._randomizer.randomize_global(
             total_mass_range=(1.6, 2.0),
-            height_field_range=(0, 0.05),
+            # height_field_range=(0, 0.05),
         )
         if len(self.sim.render_contexts) > 0:
             self.sim_scene.upload_height_field(0)
