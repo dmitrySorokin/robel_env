@@ -96,6 +96,7 @@ class ManualAutoDKittyResetProcedure(ResetProcedure):
 
         if upright < self._upright_threshold:
             return False
-        if height > self._max_height:
-            return False
+        # FIXME 
+        # if height > self._max_height:
+        #     return False
         return True
