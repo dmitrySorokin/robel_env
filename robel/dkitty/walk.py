@@ -324,3 +324,78 @@ class DKittyWalkRandomDynamics(DKittyWalkFixed):
         if len(self.sim.render_contexts) > 0:
             self.sim_scene.upload_height_field(0)
         super()._reset()
+
+
+class DKittyWalkMetaDir(DKittyWalkFixed):
+    def __init__(
+            self,
+            task={},
+            **kwargs
+    ):
+        self._task = task
+        self._goal_dir = task.get('direction', 1)
+
+        observation_keys = (
+            'root_pos',
+            'root_euler',
+            'kitty_qpos',
+            'root_vel',
+            'root_angular_vel',
+            'kitty_qvel',
+            'last_action',
+            'upright',
+            'heading',
+        )
+
+        super().__init__(**kwargs, observation_keys=observation_keys)
+
+    def sample_tasks(self, num_tasks):
+        directions = 2 * self.np_random.binomial(1, p=0.5, size=(num_tasks,)) - 1
+        tasks = [{'direction': direction} for direction in directions]
+        return tasks
+
+    def reset_task(self, task):
+        self._task = task
+        self._goal_dir = task.get('direction', 1)
+
+    def get_obs_dict(self):
+        """Returns the current observation of the environment.
+
+        Returns:
+            A dictionary of observation values. This should be an ordered
+            dictionary if `observation_keys` isn't set.
+        """
+        robot_state = self.robot.get_state('dkitty')
+        target_state, heading_state, torso_track_state = self.tracker.get_state(
+            ['target', 'heading', 'torso'])
+
+        #target_xy = target_state.pos[:2]
+        target_xy = np.array([0, 2 * self._goal_dir])
+        kitty_xy = torso_track_state.pos[:2]
+
+        # Get the heading of the torso (the y-axis).
+        current_heading = torso_track_state.rot[:2, 1]
+
+        # Get the direction towards the heading location.
+        #heading_xy = heading_state.pos[:2]
+        heading_xy = np.array([0, 2])
+        desired_heading = heading_xy - kitty_xy
+
+        # Calculate the alignment of the heading with the desired direction.
+        heading = calculate_cosine(current_heading, desired_heading)
+
+        return collections.OrderedDict((
+            # Add observation terms relating to being upright.
+            *self._get_upright_obs(torso_track_state).items(),
+            ('root_pos', torso_track_state.pos),
+            ('root_euler', torso_track_state.rot_euler),
+            ('root_vel', torso_track_state.vel),
+            ('root_angular_vel', torso_track_state.angular_vel),
+            ('kitty_qpos', robot_state.qpos),
+            ('kitty_qvel', robot_state.qvel),
+            ('last_action', self._get_last_action()),
+            ('heading', heading),
+            ('target_pos', target_xy),
+            ('target_error', target_xy - kitty_xy),
+        ))
+

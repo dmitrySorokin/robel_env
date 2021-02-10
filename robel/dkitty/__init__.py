@@ -82,3 +82,8 @@ register(
     class_path='robel.dkitty.walk:DKittyWalkRandomDynamics',
     max_episode_steps=_WALK_EPISODE_LEN)
 
+register(
+    env_id='DKittyWalkMetaDir-v0',
+    class_path='robel.dkitty.walk:DKittyWalkMetaDir',
+    max_episode_steps=_WALK_EPISODE_LEN)
+
