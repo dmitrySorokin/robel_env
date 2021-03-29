@@ -223,19 +223,7 @@ class DKittyWalkFixed(BaseDKittyWalk):
     def __init__(self, angle=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.angle = angle
-
-        floor_id = self.model.geom_name2id('floor')
-        target_id = self.model.site_name2id('target')
-        heading_id = self.model.site_name2id('heading')
-        hfield_id = self.model.geom_name2id('hfield1')
-        body_id = self.model.body_name2id('kitty_frame')
-
-        quat = euler2quat(np.sin(angle), 0, 0)
-        self.model.geom_quat[floor_id] = quat
-        self.model.geom_quat[hfield_id] = quat
-        self.model.site_quat[target_id] = quat
-        self.model.site_quat[heading_id] = quat
-        self.model.body_quat[body_id] = quat
+        self._set_angle(angle)
 
     def _reset(self):
         """Resets the environment."""
@@ -245,6 +233,22 @@ class DKittyWalkFixed(BaseDKittyWalk):
             np.cos(target_theta), np.sin(target_theta) * np.cos(self.angle), np.sin(self.angle)
         ])
         super()._reset()
+
+    def _set_angle(self, value):
+        self.angle = value
+
+        floor_id = self.model.geom_name2id('floor')
+        target_id = self.model.site_name2id('target')
+        heading_id = self.model.site_name2id('heading')
+        hfield_id = self.model.geom_name2id('hfield1')
+        body_id = self.model.body_name2id('kitty_frame')
+
+        quat = euler2quat(np.sin(self.angle), 0, 0)
+        self.model.geom_quat[floor_id] = quat
+        self.model.geom_quat[hfield_id] = quat
+        self.model.site_quat[target_id] = quat
+        self.model.site_quat[heading_id] = quat
+        self.model.body_quat[body_id] = quat
 
 
 @configurable(pickleable=True)
